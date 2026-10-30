@@ -160,43 +160,6 @@ class _SimpleSettingsPage extends StatefulWidget {
 }
 
 class _SimpleSettingsPageState extends State<_SimpleSettingsPage> {
-  bool _startOnBoot = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadStartOnBoot();
-  }
-
-  Future<bool> _hasStartOnBootPermissions() async =>
-      await AndroidPermissionManager.check(
-          kRequestIgnoreBatteryOptimizations) &&
-      await AndroidPermissionManager.check(kSystemAlertWindow);
-
-  Future<void> _loadStartOnBoot() async {
-    final enabled =
-        await gFFI.invokeMethod(AndroidChannel.kGetStartOnBootOpt) == true &&
-            await _hasStartOnBootPermissions();
-    if (mounted) setState(() => _startOnBoot = enabled);
-  }
-
-  Future<void> _setStartOnBoot(bool value) async {
-    if (value) {
-      if (!await AndroidPermissionManager.check(
-              kRequestIgnoreBatteryOptimizations) &&
-          !await AndroidPermissionManager.request(
-              kRequestIgnoreBatteryOptimizations)) {
-        return;
-      }
-      if (!await AndroidPermissionManager.check(kSystemAlertWindow) &&
-          !await AndroidPermissionManager.request(kSystemAlertWindow)) {
-        return;
-      }
-    }
-    gFFI.invokeMethod(AndroidChannel.kSetStartOnBootOpt, value);
-    if (mounted) setState(() => _startOnBoot = value);
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -226,12 +189,6 @@ class _SimpleSettingsPageState extends State<_SimpleSettingsPage> {
                       onTap: setPasswordDialog,
                     ),
                     const Divider(),
-                    SwitchListTile(
-                      secondary: const Icon(Icons.restart_alt),
-                      title: const Text('Démarrer avec l\'appareil'),
-                      value: _startOnBoot,
-                      onChanged: _setStartOnBoot,
-                    ),
                     ListTile(
                       leading: const Icon(Icons.lock),
                       title: const Text('Changer le code de protection'),
