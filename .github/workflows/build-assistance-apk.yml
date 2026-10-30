@@ -185,3 +185,4 @@ jobs:
         with:
           name: assistance-aarch64-apk
           path: assistance-aarch64.apk
+          retention-days: 1
